@@ -1,0 +1,40 @@
+<services>
+  <service name="set_version" mode="disabled" />
+
+  <service name="tar_scm" mode="disabled">
+    <param name="url">https://github.com/tianocore/edk2-platforms</param>
+    <param name="scm">git</param>
+    <param name="filename">edk2-platforms</param>
+    <param name="versionformat">0.0~%ci~%h</param>
+    <param name="revision">201514e6f5b3989beac212cf9e6fe74438879b52</param>
+  </service>
+  <service name="recompress" mode="disabled">
+    <param name="file">*edk2-platforms*.tar</param>
+    <param name="compression">xz</param>
+  </service>
+  
+  <service name="tar_scm" mode="disabled">
+    <param name="url">https://github.com/tianocore/edk2-non-osi</param>
+    <param name="scm">git</param>
+    <param name="filename">edk2-non-osi</param>
+    <param name="versionformat">0.0~%ci~%h</param>
+    <param name="revision">bc0b6bfe2d35c734c60704d89488e6587def830d</param>
+  </service>
+  <service name="recompress" mode="disabled">
+    <param name="file">*edk2-non-osi*.tar</param>
+    <param name="compression">xz</param>
+  </service>
+  
+  <service name="tar_scm" mode="disabled">
+    <param name="url">https://github.com/google/brotli</param>
+    <param name="scm">git</param>
+    <param name="filename">brotli</param>
+    <param name="versionformat">0.0~%ci~%h</param>
+    <param name="revision">f4153a09f87cbb9c826d8fc12c74642bb2d879ea</param>
+  </service>
+  <service name="recompress" mode="disabled">
+    <param name="file">*brotli*.tar</param>
+    <param name="compression">xz</param>
+  </service>
+</services>
+

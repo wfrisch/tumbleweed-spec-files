@@ -1,0 +1,199 @@
+#
+# spec file for package transfig
+#
+# Copyright (c) 2021 SUSE LLC
+#
+# All modifications and additions to the file contributed by third parties
+# remain the property of their copyright owners, unless otherwise agreed
+# upon. The license for this file, and modifications and additions to the
+# file, is the same license as for the pristine package itself (unless the
+# license for the pristine package is not an Open Source License, in which
+# case the license is the MIT License). An "Open Source License" is a
+# license that conforms to the Open Source Definition (Version 1.9)
+# published by the Open Source Initiative.
+
+# Please submit bugfixes or comments via https://bugs.opensuse.org/
+#
+
+
+Name:           transfig
+BuildRequires:  fdupes
+BuildRequires:  libjpeg-devel
+BuildRequires:  netpbm
+BuildRequires:  texlive-latex
+%if %suse_version > 1220
+BuildRequires:  texlive-amsfonts
+BuildRequires:  texlive-cm-super
+BuildRequires:  texlive-courier
+BuildRequires:  texlive-dvips
+%if 0%{?suse_version} > 1315
+BuildRequires:  texlive-epstopdf
+%endif
+BuildRequires:  texlive-pdftex
+BuildRequires:  texlive-times
+BuildRequires:  tex(beamer.cls)
+%if 0%{?suse_version} > 1315
+BuildRequires:  tex(german.sty)
+%endif
+BuildRequires:  tex(multimedia.sty)
+BuildRequires:  tex(times.sty)
+BuildRequires:  tex(xmpmulti.sty)
+%endif
+BuildRequires:  libpng-devel
+%if 0%{?suse_version} > 1310
+BuildRequires:  pkgconfig(xpm)
+%else
+BuildRequires:  xorg-x11-libXpm-devel
+BuildRequires:  xz
+BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+%endif
+#  www.xfig.org is dead
+URL:            http://mcj.sourceforge.net/
+Provides:       fig2dev
+Provides:       transfig.3.2.3d
+Requires:       ghostscript-fonts-std
+Requires:       ghostscript-library
+Requires:       netpbm
+%if 0%{?suse_version} > 1315
+Requires:       texlive-epstopdf
+%endif
+Version:        3.2.8b
+Release:        0
+Summary:        Graphic Converter
+#Source:        http://sourceforge.net/projects/mcj/files/fig2dev-%{version}.tar.xz/download#/fig2dev-%{version}.tar.xz
+License:        MIT
+Group:          Productivity/Graphics/Convertors
+Source:         fig2dev-%{version}.tar.xz
+Patch0:         transfig-3.2.8.dif
+Patch1:         1b09a8.patch
+Patch4:         transfig-fix-afl.patch
+Patch43:        fig2dev-3.2.6-fig2mpdf.patch
+Patch44:        fig2dev-3.2.6-fig2mpdf-doc.patch
+Patch45:        fig2dev-3.2.6a-RGBFILE.patch
+
+%description
+TransFig is a set of tools for creating TeX documents with graphics
+that are portable in the sense that they can be printed in a wide
+variety of environments.
+
+The transfig directory contains the source for the transfig command
+which generates a Makefile which translates Fig code to various
+graphics description languages using the fig2dev program.  In previous
+releases, this command was implemented as a shell script.
+
+Documentation: man transfig
+
+
+
+Authors:
+--------
+    Anthony Starks     <ajs@merck.com>
+    George Ferguson    <ferguson@cs.rochester.edu>
+    Herbert Bauer      <heb@regent.e-technik.tu-muenchen.de>
+    Micah Beck         <supoj@sally.utexas.edu>
+    Supoj Sutantavibul <beck@cs.utk.ecu>
+
+%prep
+%setup -q -n fig2dev-%{version}
+find -type f | xargs -r chmod a-x,go-w
+%patch0 -p0 -b .0
+%patch1 -p0 -b .1
+%patch4 -p1 -b .afl
+%patch43 -p1 -b .mpdf
+%patch44 -p1 -b .mpdfdoc
+%patch45 -p1 -b .p45
+
+%build
+ulimit -v unlimited || :
+  #
+  # Used for detection of hardening options of gcc and linker
+  #
+  cflags ()
+  {
+      local flag=$1; shift
+      local var=$1; shift
+      test -n "${flag}" -a -n "${var}" || return
+      case "${!var}" in
+      *${flag}*) return
+      esac
+      case "$flag" in
+      -Wl,*)
+	   set -o noclobber
+	   echo 'int main () { return 0; }' > ldtest.c
+	   if ${CC:-gcc} -Werror $flag -o /dev/null -xc ldtest.c > /dev/null 2>&1 ; then
+	       eval $var=\${$var:+\$$var\ }$flag
+	   fi
+	   set +o noclobber
+	   rm -f ldtest.c
+	   ;;
+      *)
+	   if ${CC:-gcc} -Werror $flag -S -o /dev/null -xc /dev/null > /dev/null 2>&1 ; then
+	       eval $var=\${$var:+\$$var\ }$flag
+	   fi
+	   if ${CXX:-g++} -Werror $flag -S -o /dev/null -xc++ /dev/null > /dev/null 2>&1 ; then
+	       eval $var=\${$var:+\$$var\ }$flag
+	   fi
+      esac
+  }
+
+CC=gcc
+CFLAGS="%{optflags} -fno-strict-aliasing -w -D_GNU_SOURCE -std=gnu99 $(getconf LFS_CFLAGS)"
+cflags -D_FORTIFY_SOURCE=2       CFLAGS
+cflags -fstack-protector         CFLAGS
+cflags -fstack-protector-strong  CFLAGS
+cflags -fstack-protector-all     CFLAGS
+cflags -Wformat                  CFLAGS
+cflags -Wformat-security         CFLAGS
+cflags -Werror=format-security   CFLAGS
+cflags -fPIE                     CFLAGS
+cflags -pie                      LDFLAGS
+cflags -Wl,-z,relro              LDFLAGS
+cflags -Wl,-z,now                LDFLAGS
+export CC CFLAGS LDFLAGS
+chmod 755 configure
+%configure \
+    --docdir=%{_defaultdocdir}/%{name} \
+    --enable-transfig \
+    --enable-scale-pic2t2e
+make %{?_smp_mflags} CCOPTIONS="$CFLAGS"
+
+%install
+find -name '*.mpdfdoc' -o -name '*.mpdf' | xargs -r rm -vf
+make DESTDIR=%{buildroot} install
+install -m 0755 fig2mpdf/fig2mpdf %{buildroot}%{_bindir}
+install -m 0644 fig2mpdf/fig2mpdf.1 %{buildroot}%{_mandir}/man1/
+gzip -9 %{buildroot}%{_mandir}/man1/fig2mpdf.1
+
+mkdir -p %{buildroot}%{_defaultdocdir}/%{name}
+install -m 0644 [CLNR]* %{buildroot}%{_defaultdocdir}/%{name}
+%if 0%{?suse_version} > 1315
+pushd fig2mpdf/doc
+    make
+    mkdir %{buildroot}%{_defaultdocdir}/%{name}/fig2mpdf
+    rm -f overlay-sample-?.pdf
+    rm -f *.aux *.log *.nav *.out *.snm *.toc
+    install -m 0644 * %{buildroot}%{_defaultdocdir}/%{name}/fig2mpdf/
+popd
+%endif
+pushd transfig/doc
+    ../../fig2dev/fig2dev -L latex trans.fig > trans.tex
+    pdflatex manual.tex
+    pdflatex manual.tex
+    pdflatex manual.tex
+    install -m 0644 manual.pdf %{buildroot}%{_defaultdocdir}/%{name}/transfig.pdf
+popd
+
+%fdupes %{buildroot}
+
+%files
+%defattr(-,root,root)
+%{_bindir}/fig2dev
+%{_bindir}/fig2mpdf
+%{_bindir}/fig2ps2tex
+%{_bindir}/pic2tpic
+%{_bindir}/transfig
+%{_datadir}/fig2dev/
+%doc %{_defaultdocdir}/%{name}
+%doc %{_mandir}/man1/*.1*.gz
+
+%changelog

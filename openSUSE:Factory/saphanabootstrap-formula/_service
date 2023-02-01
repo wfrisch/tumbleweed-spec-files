@@ -1,0 +1,19 @@
+<services>
+  <service name="tar_scm" mode="disabled">
+    <param name="url">https://github.com/SUSE/saphanabootstrap-formula.git</param>
+    <param name="scm">git</param>
+    <param name="exclude">.git</param>
+    <param name="filename">saphanabootstrap-formula</param>
+    <param name="versionformat">0.13.1+git.%ct.%h</param>
+    <param name="revision">4db963eb32eb8584426122d8e9e8f1f736c9c8c2</param>
+  </service>
+
+  <service name="recompress" mode="disabled">
+    <param name="file">*.tar</param>
+    <param name="compression">gz</param>
+  </service>
+
+  <service name="set_version" mode="disabled">
+    <param name="basename">saphanabootstrap-formula</param>
+  </service>
+</services>

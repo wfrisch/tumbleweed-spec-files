@@ -1,0 +1,17 @@
+<services>
+  <service name="tar_scm" mode="disabled">
+    <param name="filename">ocaml-gen</param>
+    <param name="revision">2ab29e69102b5bd4b4e2d3fca3d6b3b84c985446</param>
+    <param name="scm">git</param>
+    <param name="submodules">disable</param>
+    <param name="url">https://github.com/c-cube/gen.git</param>
+    <param name="versionformat">@PARENT_TAG@</param>
+    <param name="versionrewrite-pattern">[v]?([^\+]+)(.*)</param>
+    <param name="versionrewrite-replacement">\1</param>
+  </service>
+  <service name="recompress" mode="disabled">
+    <param name="file">*.tar</param>
+    <param name="compression">xz</param>
+  </service>
+  <service name="set_version" mode="disabled"/>
+</services>

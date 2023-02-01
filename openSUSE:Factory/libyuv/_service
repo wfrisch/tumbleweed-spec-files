@@ -1,0 +1,15 @@
+<services>
+  <service name="obs_scm" mode="manual">
+    <param name="scm">git</param>
+    <param name="url">https://chromium.googlesource.com/libyuv/libyuv.git</param>
+    <param name="revision">f9fda6e7d819c07a684ba6bc97cbf0e257bbcb37</param>
+    <param name="versionformat">%cd+%h</param>
+    <param name="changesgenerate">enable</param>
+  </service>
+  <service name="tar" mode="buildtime"/>
+  <service name="recompress" mode="buildtime">
+    <param name="compression">xz</param>
+    <param name="file">*.tar</param>
+  </service>
+  <service name="set_version" mode="manual"/>
+</services>

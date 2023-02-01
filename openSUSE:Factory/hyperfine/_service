@@ -1,0 +1,25 @@
+<services>
+  <service name="obs_scm" mode="disabled">
+    <param name="scm">git</param>
+    <param name="url">https://github.com/sharkdp/hyperfine.git</param>
+    <param name="revision">4fe8db41a4bd151ad54908762fba635d25ef230b</param>
+    <param name="versionformat">@PARENT_TAG@+g@TAG_OFFSET@</param>
+    <param name="versionrewrite-pattern">v(.*)</param>
+    <param name="versionrewrite-replacement">\1</param>
+    <param name="changesgenerate">enable</param>
+    <param name="changesauthor">socvirnyl.estela@gmail.com</param>
+  </service>
+  <service mode="disabled" name="tar" />
+  <service mode="disabled" name="recompress">
+    <param name="file">*.tar</param>
+    <param name="compression">xz</param>
+  </service>
+  <service mode="disabled" name="set_version"/>
+  <service name="cargo_vendor" mode="disabled">
+     <param name="update">true</param>
+     <param name="srcdir">hyperfine</param>
+     <param name="compression">xz</param>
+  </service>
+  <service name="cargo_audit" mode="disabled" />
+</services>
+

@@ -1,0 +1,10 @@
+<services>
+  <service name="download_files" mode="disabled" /> 
+  <service name="cargo_vendor" mode="disabled">
+     <param name="update">true</param>
+     <param name="srctar">v14.1.0.tar.gz</param>
+     <param name="compression">gz</param>
+  </service>
+  <service name="cargo_audit" mode="disabled" />
+</services>
+
